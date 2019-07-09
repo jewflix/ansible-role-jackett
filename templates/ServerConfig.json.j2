@@ -4,9 +4,9 @@
   "{{ key }}": true
 {%-  elif value is sameas false %}
   "{{ key }}" : false
-{%-  elif value is string and value|length >= 1 %}
+{%-  elif value is string and value|length > 0 %}
   "{{ key }}": "{{ value }}"
-{%-  elif value is string and value|length <= 1 %}
+{%-  elif value is string and value|length < 1 %}
   "{{ key }}": null
 {%-  elif value is number %}
   "{{ key }}": {{ value|int }}
