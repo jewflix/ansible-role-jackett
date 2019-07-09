@@ -1,10 +1,39 @@
 ---
-- name: Ensure the jackett dependencies are installed
+- name: Ensure the jackett dependencies are installed (Debian)
   tags: jackett
   become: true
-  package:
+  apt:
     name: "{{ jackett_packages }}"
     state: present
+  vars:
+    jackett_packages:
+      - libcurl4
+      - libicu63
+      - liblttng-ust0
+      - libkrb5-3
+      - libssl1.1
+      - libunwind8
+      - libuuid1
+      - zlib1g
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure the jackett dependencies are installed (RedHat)
+  tags: jackett
+  become: true
+  yum:
+    name: "{{ jackett_packages }}"
+    state: present
+  vars:
+    jackett_packages:
+      - krb5-libs
+      - libcurl
+      - libicu
+      - libunwind
+      - libuuid
+      - lttng-ust
+      - openssl-libs
+      - zlib
+  when: ansible_os_family == 'RedHat'
 
 - name: Ensure the jackett group is present
   tags: jackett

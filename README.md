@@ -4,7 +4,7 @@
 [![Ansible Galaxy](https://img.shields.io/badge/ansible--galaxy-jackett-blue.svg?style=flat)](https://galaxy.ansible.com/jewflix/jackett)
 [![License](https://img.shields.io/badge/license-GPLv3-brightgreen.svg?style=flat)](COPYING)
 
-CentOS/RedHat - API Support for your favorite torrent trackers
+Debian/RedHat - API Support for your favorite torrent trackers
 
 ## Requirements
 
@@ -15,15 +15,6 @@ None
     jackett_group: jackett
     jackett_home: /opt/jackett
     jackett_owner: jackett
-    jackett_packages:
-      - krb5-libs
-      - libcurl
-      - libicu
-      - libunwind
-      - libuuid
-      - lttng-ust
-      - openssl-libs
-      - zlib
     jackett_serverconfig:
       Port: 9117
       AllowExternal: true

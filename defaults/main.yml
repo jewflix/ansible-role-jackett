@@ -2,15 +2,6 @@
 jackett_group: jackett
 jackett_home: /opt/jackett
 jackett_owner: jackett
-jackett_packages:
-  - krb5-libs
-  - libcurl
-  - libicu
-  - libunwind
-  - libuuid
-  - lttng-ust
-  - openssl-libs
-  - zlib
 jackett_serverconfig:
   Port: 9117
   AllowExternal: true
