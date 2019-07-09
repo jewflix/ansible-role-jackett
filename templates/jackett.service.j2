@@ -1,0 +1,17 @@
+[Unit]
+Description=API Support for your favorite torrent trackers
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ jackett_home }}
+ExecStart={{ [jackett_home, 'jackett']|join('/') }} --NoRestart
+Restart=always
+RestartSec=120
+SyslogIdentifier=jackett
+TimeoutStopSec=20
+User={{ jackett_owner }}
+Group={{ jackett_group }}
+
+[Install]
+WantedBy=multi-user.target

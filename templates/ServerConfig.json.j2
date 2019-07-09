@@ -1,0 +1,17 @@
+{
+{% for key, value in jackett_serverconfig.items() %}
+{%-  if value is sameas true %}
+  "{{ key }}": true
+{%-  elif value is sameas false %}
+  "{{ key }}" : false
+{%-  elif value is string and value|length >= 1 %}
+  "{{ key }}": "{{ value }}"
+{%-  elif value is string and value|length <= 1 %}
+  "{{ key }}": null
+{%-  elif value is number %}
+  "{{ key }}": {{ value|int }}
+{%-  else %}
+  "{{ key }}": "{{ value }}"
+{%-  endif %}{{ ',' if not loop.last else '' }}
+{% endfor %}
+}

@@ -1,0 +1,151 @@
+---
+- name: Ensure the jackett dependencies are installed
+  tags: jackett
+  become: true
+  package:
+    name: "{{ jackett_packages }}"
+    state: present
+
+- name: Ensure the jackett group is present
+  tags: jackett
+  become: true
+  group:
+    gid: "{{ jackett_gid|default(omit) }}"
+    name: "{{ jackett_group }}"
+    state: present
+    system: true
+
+- name: Ensure the jackett user is present
+  tags: jackett
+  become: true
+  user:
+    create_home: true
+    group: "{{ jackett_group }}"
+    home: "{{ jackett_home }}"
+    move_home: true
+    name: "{{ jackett_owner }}"
+    password_lock: true
+    shell: "{{ jackett_shell }}"
+    skeleton: 'no'
+    state: present
+    system: true
+    uid: "{{ jackett_uid|default(omit) }}"
+
+- name: Gathering attributes of {{ [jackett_home, 'Jackett', 'ServerConfig.json']|join('/') }}
+  tags: jackett
+  become: true
+  stat:
+    path: "{{ [jackett_home, 'Jackett', 'ServerConfig.json']|join('/') }}"
+  register: _jackett_conf
+
+- name: Gathering the latest jackett release information from github
+  tags: jackett
+  uri:
+    method: GET
+    status_code: 200
+    url: https://api.github.com/repos/jackett/Jackett/releases/latest
+  register: _jackett_uri
+  when: not _jackett_conf.stat.exists
+
+- name: Gathering jackett version information
+  tags: jackett
+  set_fact:
+    jackett_version: "{{ _jackett_uri.json.name }}"
+  when: not _jackett_conf.stat.exists
+
+- name: Creating temporary file for release download
+  tags: jackett
+  become: true
+  tempfile:
+    prefix: 'jackett.'
+    state: file
+    suffix: '.tar.gz'
+  register: _jackett_tempfile
+  when: not _jackett_conf.stat.exists
+
+- name: Fetching the latest linux x86_64 jackett release
+  tags: jackett
+  become: true
+  get_url:
+    dest: "{{ _jackett_tempfile.path }}"
+    force: true
+    group: "{{ jackett_group }}"
+    mode: 0644
+    owner: "{{ jackett_owner }}"
+    url: 'https://github.com/Jackett/Jackett/releases/download/{{ jackett_version }}/Jackett.Binaries.LinuxAMDx64.tar.gz'
+  when: not _jackett_conf.stat.exists
+
+- name: Extracting jackett release into {{ jackett_home }}
+  tags: jackett
+  become: true
+  unarchive:
+    dest: "{{ jackett_home }}"
+    extra_opts:
+      - --strip-components=1
+    group: "{{ jackett_group }}"
+    owner: "{{ jackett_owner }}"
+    remote_src: true
+    src: "{{ _jackett_tempfile.path }}"
+  when: not _jackett_conf.stat.exists
+
+- name: Purging temporary file from filesystem
+  tags: jackett
+  become: true
+  file:
+    path: "{{ _jackett_tempfile.path }}"
+    state: absent
+  when: not _jackett_conf.stat.exists
+
+- name: Overlaying jackett systemd service
+  tags: jackett
+  become: true
+  template:
+    dest: /usr/lib/systemd/system/jackett.service
+    group: root
+    mode: 0644
+    owner: root
+    src: jackett.service.j2
+  register: _jackett_systemd
+
+- name: Reload the systemd manager configuration, if applicable
+  tags: jackett
+  become: true
+  systemd:
+    daemon_reload: true
+  when: _jackett_systemd.changed|bool
+
+- name: Stopping jackett service to overlay configuration settings
+  tags: jackett
+  become: true
+  service:
+    name: jackett
+    state: stopped
+
+- name: Creating jackett configuration directory
+  tags: jackett
+  become: true
+  file:
+    group: "{{ jackett_group }}"
+    mode: 0700
+    owner: "{{ jackett_owner }}"
+    path: "{{ [jackett_home, 'Jackett']|join('/') }}"
+    state: directory
+
+- name: Overlaying the jackett server configuration
+  tags: jackett
+  become: true
+  template:
+    dest: "{{ [jackett_home, 'Jackett', 'ServerConfig.json']|join('/') }}"
+    group: "{{ jackett_group }}"
+    mode: 0600
+    owner: "{{ jackett_owner }}"
+    src: ServerConfig.json.j2
+
+- name: Ensure the jackett service is started and enabled on boot
+  tags: jackett
+  become: true
+  service:
+    enabled: true
+    name: jackett
+    state: started
+...
