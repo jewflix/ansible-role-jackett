@@ -134,14 +134,12 @@
     mode: 0644
     owner: root
     src: jackett.service.j2
-  register: _jackett_systemd
 
-- name: Reload the systemd manager configuration, if applicable
+- name: Reload the systemd manager configuration
   tags: jackett
   become: true
   systemd:
     daemon_reload: true
-  when: _jackett_systemd.changed|bool
 
 - name: Stopping jackett service to overlay configuration settings
   tags: jackett
