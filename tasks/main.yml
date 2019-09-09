@@ -168,6 +168,15 @@
     owner: "{{ jackett_owner }}"
     src: ServerConfig.json.j2
 
+- name: Recursively updating {{ jackett_home }} permissions
+  tags: jackett
+  become: true
+  file:
+    group: "{{ jackett_group }}"
+    path: "{{ jackett_home }}"
+    owner: "{{ jackett_owner }}"
+    recurse: true
+
 - name: Ensure the jackett service is started and enabled on boot
   tags: jackett
   become: true
