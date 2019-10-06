@@ -92,7 +92,7 @@
   register: _jackett_tempfile
   when: not _jackett_conf.stat.exists
 
-- name: Fetching the latest linux x86_64 jackett release
+- name: Fetching the latest linux jackett release (x86_64)
   tags: jackett
   become: true
   get_url:
@@ -102,7 +102,23 @@
     mode: 0644
     owner: "{{ jackett_owner }}"
     url: 'https://github.com/Jackett/Jackett/releases/download/{{ jackett_version }}/Jackett.Binaries.LinuxAMDx64.tar.gz'
-  when: not _jackett_conf.stat.exists
+  when:
+    - not _jackett_conf.stat.exists
+    - ansible_architecture == "x86_64"
+
+- name: Fetching the latest linux jackett release (ARMv7_32)
+  tags: jackett
+  become: true
+  get_url:
+    dest: "{{ _jackett_tempfile.path }}"
+    force: true
+    group: "{{ jackett_group }}"
+    mode: 0644
+    owner: "{{ jackett_owner }}"
+    url: 'https://github.com/Jackett/Jackett/releases/download/{{ jackett_version }}/Jackett.Binaries.LinuxARM32.tar.gz'
+  when:
+    - not _jackett_conf.stat.exists
+    - ansible_architecture == "armv7l"
 
 - name: Extracting jackett release into {{ jackett_home }}
   tags: jackett
