@@ -15,6 +15,8 @@ None
     jackett_group: jackett
     jackett_home: /opt/jackett
     jackett_owner: jackett
+    jackett_opts:
+      - '--NoRestart'
     jackett_serverconfig:
       Port: 9117
       AllowExternal: true
@@ -43,7 +45,10 @@ None
 
     - hosts: jewflix
       roles:
-        - jewflix.jackett
+        - role: jewflix.jackett
+          jackett_opts:
+            - '--IgnoreSslErrors true'
+            - '--NoRestart'
 
 ## License
 

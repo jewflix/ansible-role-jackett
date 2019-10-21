@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory={{ jackett_home }}
-ExecStart={{ [jackett_home, 'jackett']|join('/') }} --NoRestart
+ExecStart={{ [jackett_home, 'jackett']|join('/') }} {{ jackett_opts|join(' ') }}
 Restart=always
 RestartSec=120
 SyslogIdentifier=jackett

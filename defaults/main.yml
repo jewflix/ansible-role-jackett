@@ -1,6 +1,8 @@
 ---
 jackett_group: jackett
 jackett_home: /opt/jackett
+jackett_opts:
+  - '--NoRestart'
 jackett_owner: jackett
 jackett_serverconfig:
   Port: 9117
