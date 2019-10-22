@@ -36,6 +36,7 @@ None
       ProxyPassword: ''
       ProxyIsAnonymous: true
     jackett_shell: /sbin/nologin
+    jackett_update: false
 
 ## Dependencies
 
@@ -49,6 +50,7 @@ None
           jackett_opts:
             - '--IgnoreSslErrors true'
             - '--NoRestart'
+          jackett_update: true
 
 ## License
 

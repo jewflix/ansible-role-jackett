@@ -74,13 +74,13 @@
     status_code: 200
     url: https://api.github.com/repos/jackett/Jackett/releases/latest
   register: _jackett_uri
-  when: not _jackett_conf.stat.exists
+  when: not _jackett_conf.stat.exists or jackett_update|bool
 
 - name: Gathering jackett version information
   tags: jackett
   set_fact:
     jackett_version: "{{ _jackett_uri.json.name }}"
-  when: not _jackett_conf.stat.exists
+  when: not _jackett_conf.stat.exists or jackett_update|bool
 
 - name: Creating temporary file for release download
   tags: jackett
@@ -90,7 +90,7 @@
     state: file
     suffix: '.tar.gz'
   register: _jackett_tempfile
-  when: not _jackett_conf.stat.exists
+  when: not _jackett_conf.stat.exists or jackett_update|bool
 
 - name: Fetching the latest linux jackett release (x86_64)
   tags: jackett
@@ -103,7 +103,7 @@
     owner: "{{ jackett_owner }}"
     url: 'https://github.com/Jackett/Jackett/releases/download/{{ jackett_version }}/Jackett.Binaries.LinuxAMDx64.tar.gz'
   when:
-    - not _jackett_conf.stat.exists
+    - not _jackett_conf.stat.exists or jackett_update|bool
     - ansible_architecture == "x86_64"
 
 - name: Fetching the latest linux jackett release (ARMv7_32)
@@ -117,7 +117,7 @@
     owner: "{{ jackett_owner }}"
     url: 'https://github.com/Jackett/Jackett/releases/download/{{ jackett_version }}/Jackett.Binaries.LinuxARM32.tar.gz'
   when:
-    - not _jackett_conf.stat.exists
+    - not _jackett_conf.stat.exists or jackett_update|bool
     - ansible_architecture == "armv7l"
 
 - name: Extracting jackett release into {{ jackett_home }}
@@ -131,7 +131,7 @@
     owner: "{{ jackett_owner }}"
     remote_src: true
     src: "{{ _jackett_tempfile.path }}"
-  when: not _jackett_conf.stat.exists
+  when: not _jackett_conf.stat.exists or jackett_update|bool
 
 - name: Purging temporary file from filesystem
   tags: jackett
@@ -139,7 +139,7 @@
   file:
     path: "{{ _jackett_tempfile.path }}"
     state: absent
-  when: not _jackett_conf.stat.exists
+  when: not _jackett_conf.stat.exists or jackett_update|bool
 
 - name: Overlaying jackett systemd service
   tags: jackett

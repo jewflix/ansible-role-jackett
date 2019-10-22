@@ -23,4 +23,5 @@ jackett_serverconfig:
   ProxyPassword: ''
   ProxyIsAnonymous: true
 jackett_shell: /sbin/nologin
+jackett_update: false
 ...
