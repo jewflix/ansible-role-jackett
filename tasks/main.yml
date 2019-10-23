@@ -60,12 +60,36 @@
     system: true
     uid: "{{ jackett_uid|default(omit) }}"
 
+- name: Overlaying jackett systemd service
+  tags: jackett
+  become: true
+  template:
+    dest: /usr/lib/systemd/system/jackett.service
+    group: root
+    mode: 0644
+    owner: root
+    src: jackett.service.j2
+
+- name: Reload the systemd manager configuration
+  tags: jackett
+  become: true
+  systemd:
+    daemon_reload: true
+
 - name: Gathering attributes of {{ [jackett_home, 'Jackett', 'ServerConfig.json']|join('/') }}
   tags: jackett
   become: true
   stat:
     path: "{{ [jackett_home, 'Jackett', 'ServerConfig.json']|join('/') }}"
   register: _jackett_conf
+
+- name: Stopping jackett service to overlay configuration settings
+  tags: jackett
+  become: true
+  service:
+    name: jackett
+    state: stopped
+  when: _jackett_conf.stat.exists
 
 - name: Gathering the latest jackett release information from github
   tags: jackett
@@ -140,29 +164,6 @@
     path: "{{ _jackett_tempfile.path }}"
     state: absent
   when: not _jackett_conf.stat.exists or jackett_update|bool
-
-- name: Overlaying jackett systemd service
-  tags: jackett
-  become: true
-  template:
-    dest: /usr/lib/systemd/system/jackett.service
-    group: root
-    mode: 0644
-    owner: root
-    src: jackett.service.j2
-
-- name: Reload the systemd manager configuration
-  tags: jackett
-  become: true
-  systemd:
-    daemon_reload: true
-
-- name: Stopping jackett service to overlay configuration settings
-  tags: jackett
-  become: true
-  service:
-    name: jackett
-    state: stopped
 
 - name: Creating jackett configuration directory
   tags: jackett
