@@ -1,4 +1,6 @@
 ---
+jackett_cpuaccounting: false
+jackett_cpuquota: 100%
 jackett_group: jackett
 jackett_home: /opt/jackett
 jackett_opts:

@@ -12,6 +12,8 @@ None
 
 ## Role Variables
 
+    jackett_cpuaccounting: false
+    jackett_cpuquota: 100%
     jackett_group: jackett
     jackett_home: /opt/jackett
     jackett_owner: jackett
@@ -47,6 +49,8 @@ None
     - hosts: jewflix
       roles:
         - role: jewflix.jackett
+          jackett_cpuaccounting: true
+          jackett_cpuquota: 25%
           jackett_opts:
             - '--IgnoreSslErrors true'
             - '--NoRestart'

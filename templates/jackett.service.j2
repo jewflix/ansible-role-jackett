@@ -3,6 +3,8 @@ Description=API Support for your favorite torrent trackers
 After=network.target
 
 [Service]
+CPUAccounting={{ jackett_cpuaccounting }}
+CPUQuota={{ jackett_cpuquota }}
 Type=simple
 WorkingDirectory={{ jackett_home }}
 ExecStart={{ [jackett_home, 'jackett']|join('/') }} {{ jackett_opts|join(' ') }}
