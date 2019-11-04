@@ -3,7 +3,7 @@ Description=API Support for your favorite torrent trackers
 After=network.target
 
 [Service]
-CPUAccounting={{ jackett_cpuaccounting }}
+CPUAccounting={{ 'true' if jackett_cpuaccounting|bool else 'false' }}
 CPUQuota={{ jackett_cpuquota }}
 ExecStart=/usr/bin/bash -c '{{ [jackett_home, 'jackett']|join('/') }} {{ jackett_opts|join(' ') }}; while pgrep -u jackett JackettUpdater; do sleep 1; done'
 Group={{ jackett_group }}
