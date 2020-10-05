@@ -5,12 +5,12 @@ After=network.target
 [Service]
 CPUAccounting={{ 'true' if jackett_cpuaccounting|bool else 'false' }}
 CPUQuota={{ jackett_cpuquota }}
-ExecStart=/usr/bin/bash -c '{{ [jackett_home, 'jackett']|join('/') }} {{ jackett_opts|join(' ') }}; while pgrep -u jackett JackettUpdater; do sleep 1; done'
+ExecStart=/bin/sh "{{ jackett_home }}/jackett_launcher.sh"
 Group={{ jackett_group }}
 Restart=always
-RestartSec=120
+RestartSec=5
 SyslogIdentifier=jackett
-TimeoutStopSec=20
+TimeoutStopSec=30
 Type=simple
 User={{ jackett_owner }}
 WorkingDirectory={{ jackett_home }}
